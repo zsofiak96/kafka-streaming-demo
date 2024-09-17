@@ -17,6 +17,14 @@ To exit the shell run:
 exit
 ```
 
+### Code formatting and linting
+To ensure proper code quality the project uses [pre-commit hooks](https://pre-commit.com/).
+The [ruff](https://docs.astral.sh/ruff/) formatter and linter is also part of the pre-commit config.
+The pre-commit hooks need to be installed in the local set up to be effective:
+```bash
+pre-commit install
+```
+
 ### Documentation
 The project documentation uses Github Pages. The site is currently being built from the `/docs` folder in the `main` branch.
 
@@ -58,3 +66,4 @@ docker-compose down --rmi local
 | `KAFKA_LOG_MESSAGE_FORMAT_VERSION` | `3.0` | the log message format version |
 | `KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE` | `false` | disable the collection of `Confluent` support metrics |
 | `CLUSTER_ID` | `kafka-streaming-demo-cluster` |  the unique identifier of the `Kafka` broker |
+

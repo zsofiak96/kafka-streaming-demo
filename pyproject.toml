@@ -13,8 +13,11 @@ pyspark = "^3.5.2"
 requests = "^2.32.3"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.3.3"
+ruff = "^0.6.5"
+pre-commit = "^3.8.0"
 
+[tool.poetry.group.test.dependencies]
+pytest = "^8.3.3"
 
 [build-system]
 requires = ["poetry-core"]
