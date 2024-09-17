@@ -18,10 +18,4 @@ exit
 ```
 
 ### Documentation
-The project documentation is built with [mkdocs](https://www.mkdocs.org) 
-and [mkdocs-material](https://squidfunk.github.io/mkdocs-material).
-
-Start the live-reloading docs server with:
-```bash
-mkdocs serve
-```
+The project documentation uses Github Pages. The site is currently being built from the `/docs` folder in the `main` branch.

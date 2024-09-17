@@ -1,5 +1,0 @@
-site_name: Kafka Streaming Demo
-nav:
-  - About: index.md
-theme:
-  name: material
