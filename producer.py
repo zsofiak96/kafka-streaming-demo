@@ -9,27 +9,7 @@ from confluent_kafka.admin import AdminClient, NewTopic
 from confluent_kafka import Producer
 
 from constants import (
-    ALL,
-    CLOUDS,
-    COUNTRY,
-    DEG,
-    DT,
-    FEELS_LIKE,
-    GRND_LEVEL,
-    HUMIDITY,
-    MAIN,
-    PRESSURE,
-    SEA_LEVEL,
-    SPEED,
-    SUNRISE,
-    SUNSET,
-    SYS,
-    TEMP,
-    TEMP_MAX,
-    TEMP_MIN,
-    VISIBILITY,
     WEATHER,
-    WIND,
 )
 from models import RawData, RequestParameters
 
@@ -55,27 +35,16 @@ def fetch_open_weather_map_api(
             data = response.json()
             normalized_data = pd.json_normalize(
                 data,
-                record_path=[WEATHER],
-                meta=[
-                    DT,
-                    [MAIN, TEMP],
-                    [MAIN, FEELS_LIKE],
-                    [MAIN, TEMP_MIN],
-                    [MAIN, TEMP_MAX],
-                    [MAIN, PRESSURE],
-                    [MAIN, SEA_LEVEL],
-                    [MAIN, GRND_LEVEL],
-                    [MAIN, HUMIDITY],
-                    [VISIBILITY],
-                    [WIND, SPEED],
-                    [WIND, DEG],
-                    [CLOUDS, ALL],
-                    [SYS, COUNTRY],
-                    [SYS, SUNRISE],
-                    [SYS, SUNSET],
-                ],
                 sep="_",
-                record_prefix=f"{WEATHER}_",
+            )
+            normalized_data = pd.concat(
+                [
+                    normalized_data.drop(columns=[WEATHER]),
+                    pd.json_normalize(normalized_data[WEATHER][0]).add_prefix(
+                        f"{WEATHER}_"
+                    ),
+                ],
+                axis=1,
             ).to_dict(orient="records")[0]
             raw_data = RawData(**normalized_data)
         case _:
@@ -112,7 +81,7 @@ if __name__ == "__main__":
             ]
         )
 
-    schedule.every(5).minutes.do(main)
+    schedule.every(0.25).minutes.do(main)
 
     while True:
         schedule.run_pending()
