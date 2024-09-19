@@ -32,6 +32,11 @@ class RawData(BaseModel):
     wind_speed_in_meter_per_second: float = Field(alias="wind_speed")
 
 
+class RawDataKey(BaseModel):
+    latitude: float
+    longitude: float
+
+
 class RequestParameters(BaseModel):
     lat: float
     lon: float

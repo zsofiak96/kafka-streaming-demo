@@ -11,7 +11,7 @@ from confluent_kafka import Producer
 from constants import (
     WEATHER,
 )
-from models import RawData, RequestParameters
+from models import RawData, RawDataKey, RequestParameters
 
 import pandas as pd
 
@@ -72,7 +72,13 @@ def main() -> None:
     )
 
     producer = Producer(kafka_config)
-    producer.produce(WEATHER, raw_data.model_dump_json())
+    producer.produce(
+        WEATHER,
+        key=RawDataKey(
+            latitude=raw_data.latitude, longitude=raw_data.longitude
+        ).model_dump_json(),
+        value=raw_data.model_dump_json(),
+    )
     producer.flush()
 
 
