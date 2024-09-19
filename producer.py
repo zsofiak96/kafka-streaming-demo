@@ -29,6 +29,11 @@ def fetch_open_weather_map_api(
     parameters: RequestParameters,
     base_url: str = "https://api.openweathermap.org/data/2.5/weather",
 ) -> RawData | None:
+    """Fetch OpenWeatherMap API and parse response into a RawData model.
+
+    :param parameters: endpoint specific request parameters
+    :param base_url: defaults to "https://api.openweathermap.org/data/2.5/weather"
+    """
     response = requests.get(base_url, params=parameters)
     match response.status_code:
         case 200:
@@ -50,12 +55,15 @@ def fetch_open_weather_map_api(
         case _:
             raw_data = None
             logging.info(
-                f"Check your API configuration. Open Weather Map reported {response.status_code}"
+                f"Check your API configuration. Open Weather Map responded with {response.status_code}"
             )
     return raw_data
 
 
 def main() -> None:
+    """The main producer task. Fetch API for Vienna area
+    and produce to the `weather` topic.
+    """
     raw_data = fetch_open_weather_map_api(
         parameters=RequestParameters(
             lat=48.21,
@@ -81,7 +89,7 @@ if __name__ == "__main__":
             ]
         )
 
-    schedule.every(0.25).minutes.do(main)
+    schedule.every(10).minutes.do(main)
 
     while True:
         schedule.run_pending()
