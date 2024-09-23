@@ -40,5 +40,5 @@ class RawDataKey(BaseModel):
 class RequestParameters(BaseModel):
     lat: float
     lon: float
-    unit: str = "metric"
+    units: str = "metric"
     appid: str = os.getenv("API_KEY", None)
