@@ -26,3 +26,12 @@ services:
       CLUSTER_ID: "kafka-streaming-demo-cluster"
     volumes:
       - ./kafka-data:/var/lib/kafka/data
+
+  grafana:
+    image: grafana/grafana-enterprise:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
