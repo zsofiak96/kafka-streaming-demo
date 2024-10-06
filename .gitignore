@@ -164,6 +164,8 @@ cython_debug/
 # Kafka data logs
 /kafka-data
 
-# Grafana data
-/grafana
-/grafana-data
+# Influx data
+/influxdb-data
+
+# Spark checkpoint-location
+/checkpoint-location-*
