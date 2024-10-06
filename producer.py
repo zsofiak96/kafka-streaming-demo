@@ -8,6 +8,7 @@ import requests
 from confluent_kafka.admin import AdminClient, NewTopic
 from confluent_kafka import Producer
 
+from admin import create_kafka_topics
 from constants import (
     WEATHER,
 )
@@ -19,10 +20,18 @@ load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
 
+NUM_PARTITIONS = 6
 
 kafka_config = {"bootstrap.servers": os.getenv("BOOTSTRAP_SERVERS")}
 admin_client = AdminClient(kafka_config)
-kafka_topic_config = {"retention.ms": 24 * 60 * 60 * 1000}  # ~ 1day
+request_coordinates = {
+    "Klagenfurt": RawDataKey(latitude=46.63, longitude=14.31),
+    "Salzburg": RawDataKey(latitude=47.81, longitude=13.03),
+    "Graz": RawDataKey(latitude=47.07, longitude=15.42),
+    "Vienna": RawDataKey(latitude=48.21, longitude=16.36),
+    "Innsbruck": RawDataKey(latitude=47.25, longitude=11.4),
+    "Linz": RawDataKey(latitude=48.30, longitude=14.28),
+}
 
 
 def fetch_open_weather_map_api(
@@ -60,42 +69,53 @@ def fetch_open_weather_map_api(
     return raw_data
 
 
+def check_success(err, msg):
+    if err is not None:
+        print(f"Failed to deliver message:\n" f"msg -> {msg}\n" f"error -> {err}")
+    else:
+        print(
+            f"Message with key {msg.key()} was produced to topic {msg.topic()} to partition {msg.partition()}"
+        )
+
+
 def main() -> None:
     """The main producer task. Fetch API for Vienna area
     and produce to the `weather` topic.
     """
-    raw_data = fetch_open_weather_map_api(
-        parameters=RequestParameters(
-            lat=48.21,
-            lon=16.36,
-        )
-    )
-
     producer = Producer(kafka_config)
-    producer.produce(
-        WEATHER,
-        key=RawDataKey(
-            latitude=raw_data.latitude, longitude=raw_data.longitude
-        ).model_dump_json(),
-        value=raw_data.model_dump_json(),
-    )
-    producer.flush()
+    for request_key, request_value in request_coordinates.items():
+        raw_data = fetch_open_weather_map_api(
+            parameters=RequestParameters(
+                lat=request_value.latitude,
+                lon=request_value.longitude,
+            )
+        )
+        producer.produce(
+            WEATHER,
+            key=request_key,
+            value=raw_data.model_dump_json(),
+            callback=check_success,
+            headers={"city_name": request_key},
+        )
+
+        logging.info(f"Produced values with key: {request_key}")
+
+        producer.flush()
 
 
 if __name__ == "__main__":
-    if WEATHER not in admin_client.list_topics().topics.keys():
-        admin_client.create_topics(
-            [
-                NewTopic(
-                    WEATHER,
-                    num_partitions=1,
-                    replication_factor=1,
-                    config=kafka_topic_config,
-                )
-            ]
-        )
+    create_kafka_topics(
+        [
+            NewTopic(
+                WEATHER,
+                num_partitions=NUM_PARTITIONS,
+                replication_factor=1,
+                config={"retention.ms": 24 * 60 * 60 * 1000},
+            )
+        ]
+    )
 
-    schedule.every(10).minutes.do(main)
+    schedule.every(0.25).minutes.do(main)
 
     while True:
         schedule.run_pending()

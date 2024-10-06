@@ -1,4 +1,4 @@
-# Kafka Producer
+# Producer API
 
 The initial kafka producer fetches the [OpenWeather API](https://openweathermap.org/) every 10 minutes.
 The APi itself updates its data every 10 minutes.
