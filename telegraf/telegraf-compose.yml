@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  telegraf-weather:
+    image: telegraf:latest
+    container_name: telegraf-weather
+    environment:
+      INFLUX_TOKEN: $INFLUX_TELEGRAF_CONF_WEATHER_TOKEN
+    command: telegraf --config http://influxdb:8086/api/v2/telegrafs/$INFLUX_TELEGRAF_CONF_WEATHER_ENDPOINT
+
+  telegraf-weather-processed:
+    image: telegraf:latest
+    container_name: telegraf-weather-processed
+    environment:
+      INFLUX_TOKEN: $INFLUX_TELEGRAF_CONF_WEATHER_PROCESSED_TOKEN
+    command: telegraf --config http://influxdb:8086/api/v2/telegrafs/$INFLUX_TELEGRAF_CONF_WEATHER_PROCESSED_ENDPOINT

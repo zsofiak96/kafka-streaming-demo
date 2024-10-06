@@ -41,4 +41,4 @@ class RequestParameters(BaseModel):
     lat: float
     lon: float
     units: str = "metric"
-    appid: str = os.getenv("API_KEY", None)
+    appid: str = os.getenv("OPEN_WEATHER_API_KEY", None)
